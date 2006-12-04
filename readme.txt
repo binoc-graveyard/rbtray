@@ -1,4 +1,4 @@
- RBTray 3.1
+ RBTray 3.2
   GNUware
   (Distributed under terms of GNU General Public License - see below)
   Copyright (C) 1999-2005 by Nikolay Redko
