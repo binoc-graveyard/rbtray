@@ -1,11 +1,13 @@
  RBTray 3.2
   GNUware
   (Distributed under terms of GNU General Public License - see below)
-  Copyright (C) 1999-2005 by Nikolay Redko
+  Copyright (C) 1999-2006 by Nikolay Redko
+
+  http://rbtray.sf.net
 
  Allows you to minimize windows in the tray area on
  taskbar by clicking right mouse button on the window's
- minimize/close box or from system menu or from window's system menu (+).
+ minimize/close box or from system menu or from window's system menu, or by Win-T hotkey.
  Allows to set any window in "Always on top" state from window's system menu.
 
  ver. 3.2: Minor fix with pop-up menu for cases when taskbar is placed on any side of the screen, except of bottom.
