@@ -227,7 +227,7 @@ HookWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
   NOTIFYICONDATA nid;
   int i;
-//  char buff[255];
+  char buff[255];
 //  DWORD ProcessId;
   HMENU hSysMenu;
   switch (msg) {
@@ -265,12 +265,17 @@ HookWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 Resize((HWND)lParam);
                 break;
             case IDM_TRAY:
-              for(i=MAXCOUNT-1;i>=0;i--)
-                if(!list[i])break;
-              if (i < 0)break;
-
-              list[i]=(HWND)lParam;
-
+			  // prohibit hiding of explorer's taskbar			
+			  GetClassName((HWND)lParam, buff, 255);
+			  if(stricmp("Shell_TrayWnd", buff) == 0) break;
+			  if(stricmp("DV2ControlHost", buff) == 0) break;
+			  MessageBox(NULL, buff, "RBTray", MB_OK);
+			  for(i = 0 ; i < MAXCOUNT ;i++) { 
+				  if(!list[i]) break;
+			  }
+              if (i == MAXCOUNT) break;
+		  
+			  list[i]=(HWND)lParam;
               ShowWindow((HWND)lParam, SW_HIDE);
               ShowWindow((HWND)lParam, SW_MINIMIZE);
               AddToTray(i);
@@ -328,7 +333,7 @@ HookWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         }
         break;
     case WM_DESTROY:
-      for (i = MAXCOUNT - 1; i >= 0; i--)
+      for (i = 0; i < MAXCOUNT; i++)
         if (list[i])
         {
           ShowIt(list[i]);
@@ -343,7 +348,7 @@ HookWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	// I can't put this in the switch since WM_TASKBAR_CREATED isn't constant
 	if (msg == WM_TASKBAR_CREATED) {
-		for (i=MAXCOUNT-1;i>=0;i--) {
+		for (i = 0; i < MAXCOUNT; i++) {
 			if (list[i]) {
 				AddToTray(i);
 			}
@@ -358,6 +363,7 @@ WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR szCmdLine, int iCmdS
 {
     WNDCLASS wc;
     MSG msg;
+	int i;
 
 	lastLButtonDown = 0;
     thisInstance = hInstance;
@@ -405,6 +411,8 @@ WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR szCmdLine, int iCmdS
         return 3;
     }
 	WM_TASKBAR_CREATED = RegisterWindowMessage("TaskbarCreated");
+    for(i = 0 ; i < MAXCOUNT ;list[i++] = 0);
+
     EnumWindows((WNDENUMPROC)UpdMenu,TRUE);
     while (IsWindow(hwndHook) && GetMessage(&msg, hwndHook, 0, 0))
     {

@@ -229,6 +229,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\rbtray.ico"
+			>
+		</File>
+		<File
 			RelativePath="rbtray.rc"
 			>
 			<FileConfiguration
@@ -247,6 +251,10 @@
 					PreprocessorDefinitions=""
 				/>
 			</FileConfiguration>
+		</File>
+		<File
+			RelativePath=".\resource.h"
+			>
 		</File>
 	</Files>
 	<Globals>

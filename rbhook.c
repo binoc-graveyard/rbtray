@@ -89,6 +89,15 @@ GetMsgProc(int nCode, WPARAM wParam, LPARAM lParam)
             InsertMenu (hSysMenu, GetMenuItemID(hSysMenu,0),MF_STRING,IDM_SIZE,  "My size");
         }
     };
+	if (((MSG*)lParam)->message==WM_SHOWWINDOW && ((MSG*)lParam)->wParam == FALSE )
+    {
+		char title[256];
+		GetWindowText(((MSG*)lParam)->hwnd, title, 255);
+		if(strstr(title,"Opera") >= 0) 
+		{
+			PostMessage(FindWindow(NAME, NAME), WM_MYCMD, IDM_TRAY, ((MSG*)lParam)->hwnd);
+		}
+	}
     return CallNextHookEx(NULL, nCode, wParam, lParam);
 };
 /*LRESULT CALLBACK
