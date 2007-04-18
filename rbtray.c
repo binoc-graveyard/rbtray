@@ -269,7 +269,7 @@ HookWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			  GetClassName((HWND)lParam, buff, 255);
 			  if(stricmp("Shell_TrayWnd", buff) == 0) break;
 			  if(stricmp("DV2ControlHost", buff) == 0) break;
-			  MessageBox(NULL, buff, "RBTray", MB_OK);
+			  //MessageBox(NULL, buff, "RBTray", MB_OK);
 			  for(i = 0 ; i < MAXCOUNT ;i++) { 
 				  if(!list[i]) break;
 			  }
