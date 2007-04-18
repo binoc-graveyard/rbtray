@@ -66,7 +66,7 @@ Section "MainSection" SEC01
   File "Release\RBTray.exe"
   File "Release\RBHook.dll"
   File "readme.txt"
-  File "Sources.zip"
+;  File "Sources.zip"
 
 ; Shortcuts
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
