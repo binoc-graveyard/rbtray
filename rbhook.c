@@ -10,7 +10,7 @@ static HWND  LastHit;
 LRESULT CALLBACK
 MouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
-#define WND_CLASS "IRIS.tedit"
+
     if (nCode<0)return CallNextHookEx(hMouse, nCode, wParam, lParam);
     if (wParam == WM_NCRBUTTONDOWN
         && (((MOUSEHOOKSTRUCT*)lParam)->wHitTestCode == HTREDUCE || ((MOUSEHOOKSTRUCT*)lParam)->wHitTestCode == HTCLOSE))
@@ -26,6 +26,7 @@ MouseProc(int nCode, WPARAM wParam, LPARAM lParam)
     }
 /*  if (wParam == WM_RBUTTONUP)
     {
+        #define WND_CLASS "IRIS.tedit"
         char cls[255];
         int count;
         count = GetClassName((((MOUSEHOOKSTRUCT*)lParam)->hwnd),cls, 250);
@@ -56,7 +57,21 @@ KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 	//		wsprintf(s, "%x", GetForegroundWindow());
 	//		MessageBox(NULL, s, "",MB_OK);
 			return -1;	
+	}	
+	if((GetKeyState(VK_PAUSE) & 0x80)
+		//&&(GetWindowLong(GetForegroundWindow(), GWL_STYLE) & WS_CAPTION)
+		)
+		{
+			BYTE kState[256];
+			GetKeyboardState(kState);
+			kState[VK_PAUSE] = 0;
+			SetKeyboardState(kState);
+		    PostMessage(FindWindow(NAME, NAME), WM_MYCMD, IDM_KEY, (LPARAM)GetForegroundWindow());
+	//		wsprintf(s, "%x", GetForegroundWindow());
+	//		MessageBox(NULL, s, "",MB_OK);
+			return -1;	
 	}
+    PostMessage(FindWindow(NAME, NAME), WM_MYCMD, IDM_KEYSTAT, (LPARAM)GetForegroundWindow());
 	return CallNextHookEx(hMouse, nCode, wParam, lParam);
 };
 

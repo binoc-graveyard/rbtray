@@ -1,7 +1,7 @@
- RBTray 3.3
+ RBTray 3.4
   GNUware
   (Distributed under terms of GNU General Public License - see below)
-  Copyright (C) 1999-2006 by Nikolay Redko
+  Copyright (C) 1999-2009 by Nikolay Redko
 
   http://rbtray.sf.net
 
@@ -9,6 +9,8 @@
  taskbar by clicking right mouse button on the window's
  minimize/close box or from system menu or from window's system menu, or by Win-T hotkey.
  Allows to set any window in "Always on top" state from window's system menu.
+
+ ver. 3.4: Optional Keyboard indicator (NumLock, CapsLock, ScrollLock status)
 
  ver. 3.3: Minor fix with hiding taskbar by Win-T if start menu is open.
  		 (Win, Win-T - hides taskbar)

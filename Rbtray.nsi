@@ -2,7 +2,7 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "RBTray"
-!define PRODUCT_VERSION "3.3"
+!define PRODUCT_VERSION "3.4"
 !define PRODUCT_PUBLISHER "Nikolay Redko"
 !define PRODUCT_WEB_SITE "http://rbtray.sf.net"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\RBTray.exe"
@@ -24,6 +24,7 @@ SetCompressor lzma
 !insertmacro MUI_PAGE_WELCOME
 ; License page
 !insertmacro MUI_PAGE_LICENSE "readme.txt"
+!insertmacro MUI_PAGE_COMPONENTS
 ; Directory page
 !insertmacro MUI_PAGE_DIRECTORY
 ; Start menu page
@@ -38,7 +39,7 @@ var ICONS_GROUP
 !insertmacro MUI_PAGE_INSTFILES
 ; Finish page
 !define MUI_FINISHPAGE_RUN "$INSTDIR\RBTray.exe"
-!define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\readme.txt"
+#!define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\readme.txt"
 !insertmacro MUI_PAGE_FINISH
 
 ; Uninstaller pages
@@ -59,24 +60,19 @@ InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
 ShowUnInstDetails show
 
-Section "MainSection" SEC01
+Section "-Application" Section1
   SetOutPath "$INSTDIR"
   SetOverwrite ifnewer
   Exec '"$INSTDIR\RBTray.exe" --exit'
   File "Release\RBTray.exe"
   File "Release\RBHook.dll"
   File "readme.txt"
-;  File "Sources.zip"
+  File "Sources.zip"
 
 ; Shortcuts
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
   CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME}"
   CreateShortCut  "$SMPROGRAMS\${PRODUCT_NAME}\RBTray.lnk" "$INSTDIR\RBTray.exe"
-  !insertmacro MUI_STARTMENU_WRITE_END
-SectionEnd
-
-Section -AdditionalIcons
-  !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
   WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
   CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Website.lnk" "$INSTDIR\${PRODUCT_NAME}.url"
   CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk" "$INSTDIR\uninst.exe"
@@ -85,6 +81,11 @@ Section -AdditionalIcons
   CreateShortCut "$SMSTARTUP\RBTray.lnk" "$INSTDIR\RBTray.exe"
   !insertmacro MUI_STARTMENU_WRITE_END
 SectionEnd
+
+Section "Keyboard Indicator" Section2
+	WriteRegDWORD HKLM "${PRODUCT_DIR_REGKEY}" "Keyboard Indicator" 0x01
+SectionEnd
+
 
 Section -Post
   WriteUninstaller "$INSTDIR\uninst.exe"
@@ -132,3 +133,9 @@ Section Uninstall
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
   SetAutoClose true
 SectionEnd
+
+!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+  !insertmacro MUI_DESCRIPTION_TEXT ${Section1} "Application"
+  !insertmacro MUI_DESCRIPTION_TEXT ${Section2} "Launch with Keyboard Indicator"
+!insertmacro MUI_FUNCTION_DESCRIPTION_END
+
