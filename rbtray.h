@@ -28,6 +28,9 @@
 #define IDM_SEPARATOR   0x1010
 #define IDM_SIZE		0x1011
 #define IDM_LOTUSEDIT   0x1012
+#define IDM_KEY			0x1013
+#define IDM_KEYSTAT     0x1014
+#define IDM_SHOWKEY     0x1015
 #define DLLIMPORT __declspec(dllexport)
 
 BOOL DLLIMPORT RegisterHook(HMODULE) ;
