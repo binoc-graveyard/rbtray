@@ -22,41 +22,35 @@
 #include <windows.h>
 #include "rbtray.h"
 
-static HHOOK hMouse = NULL;
-static HHOOK hWndProc = NULL;
-static HWND hLastHit = NULL;
+static HHOOK _hMouse = NULL;
+static HHOOK _hWndProc = NULL;
+static HWND _hLastHit = NULL;
 
 LRESULT CALLBACK MouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
-	if (nCode >= 0 && (wParam == WM_NCRBUTTONDOWN || wParam == WM_NCRBUTTONUP)) {
-		HWND window = ((MOUSEHOOKSTRUCT*)lParam)->hwnd;
-		UINT hitTestCode = ((MOUSEHOOKSTRUCT*)lParam)->wHitTestCode;
-		BOOL isHit = (hitTestCode == HTMINBUTTON);
-		if (wParam == WM_NCRBUTTONDOWN) {
-			hLastHit = isHit ? window : NULL;
+	if (nCode >= 0) {
+		if (wParam == WM_NCRBUTTONDOWN || wParam == WM_NCRBUTTONUP) {
+			MOUSEHOOKSTRUCT *info = (MOUSEHOOKSTRUCT*)lParam;
+			BOOL isHit = (info->wHitTestCode == HTMINBUTTON);
+			if (wParam == WM_NCRBUTTONDOWN && isHit) {
+				_hLastHit = info->hwnd;
+				return 1;
+			}
+			else if (wParam == WM_NCRBUTTONUP && isHit) {
+				if (info->hwnd == _hLastHit) {
+					PostMessage(FindWindow(NAME, NAME), WM_ADDTRAY, 0, (LPARAM)info->hwnd);
+				}
+				_hLastHit = NULL;
+				return 1;
+			}
+			else {
+				_hLastHit = NULL;
+			}
 		}
-		else if (wParam == WM_NCRBUTTONUP && isHit && window == hLastHit) {
-			PostMessage(FindWindow(NAME, NAME), WM_ADDTRAY, 0, (LPARAM)window);
-		}
-	}
-	return CallNextHookEx(hMouse, nCode, wParam, lParam);
-}
-
-LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
-	if (nCode >= 0 && (wParam == WM_RBUTTONDOWN || wParam == WM_RBUTTONUP)) {
-		POINT point = ((MSLLHOOKSTRUCT*)lParam)->pt;
-		HWND window = WindowFromPoint(point);
-		UINT hitTestCode = window ? (UINT)SendMessage(window, WM_NCHITTEST, 0, MAKELPARAM(point.x, point.y)) : 0;
-		BOOL isHit = (hitTestCode == HTMINBUTTON);
-		if (wParam == WM_RBUTTONDOWN) {
-			hLastHit = isHit ? window : NULL;
-			if (isHit) return 1;
-		}
-		else if (wParam == WM_RBUTTONUP && isHit && window == hLastHit) {
-			PostMessage(FindWindow(NAME, NAME), WM_ADDTRAY, 0, (LPARAM)window);
-			return 1;
+		else if (wParam == WM_RBUTTONDOWN || wParam == WM_RBUTTONUP) {
+			_hLastHit = NULL;
 		}
 	}
-	return CallNextHookEx(hMouse, nCode, wParam, lParam);
+	return CallNextHookEx(_hMouse, nCode, wParam, lParam);
 }
 
 LRESULT CALLBACK CallWndRetProc(int nCode, WPARAM wParam, LPARAM lParam) {
@@ -69,16 +63,13 @@ LRESULT CALLBACK CallWndRetProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			PostMessage(FindWindow(NAME, NAME), WM_REFRTRAY, 0, (LPARAM)msg->hwnd);
 		}
 	}
-	return CallNextHookEx(hWndProc, nCode, wParam, lParam);
+	return CallNextHookEx(_hWndProc, nCode, wParam, lParam);
 }
 
 BOOL DLLIMPORT RegisterHook(HMODULE hLib) {
-	BOOL aeroCapable = LOBYTE(LOWORD(GetVersion())) >= 6;
-	hMouse = aeroCapable ?
-		SetWindowsHookEx(WH_MOUSE_LL, (HOOKPROC)LowLevelMouseProc, hLib, 0) :
-		SetWindowsHookEx(WH_MOUSE, (HOOKPROC)MouseProc, hLib, 0);
-	hWndProc = SetWindowsHookEx(WH_CALLWNDPROCRET, (HOOKPROC)CallWndRetProc, hLib, 0);
-	if (hMouse == NULL || hWndProc == NULL) {
+	_hMouse = SetWindowsHookEx(WH_MOUSE, (HOOKPROC)MouseProc, hLib, 0);
+	_hWndProc = SetWindowsHookEx(WH_CALLWNDPROCRET, (HOOKPROC)CallWndRetProc, hLib, 0);
+	if (_hMouse == NULL || _hWndProc == NULL) {
 		UnRegisterHook();
 		return FALSE;
 	}
@@ -86,12 +77,12 @@ BOOL DLLIMPORT RegisterHook(HMODULE hLib) {
 }
 
 void DLLIMPORT UnRegisterHook() {
-	if (hMouse) {
-		UnhookWindowsHookEx(hMouse);
-		hMouse = NULL;
+	if (_hMouse) {
+		UnhookWindowsHookEx(_hMouse);
+		_hMouse = NULL;
 	}
-	if (hWndProc) {
-		UnhookWindowsHookEx(hWndProc);
-		hWndProc = NULL;
+	if (_hWndProc) {
+		UnhookWindowsHookEx(_hWndProc);
+		_hWndProc = NULL;
 	}
 }

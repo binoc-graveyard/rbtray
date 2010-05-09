@@ -58,7 +58,7 @@ static void AddToTray(int i) {
 	nid.uFlags           = NIF_MESSAGE | NIF_ICON | NIF_TIP;
 	nid.uCallbackMessage = WM_TRAYCMD;
 	nid.hIcon            = GetWindowIcon(_hwndItems[i]);
-	GetWindowText(_hwndItems[i], nid.szTip, sizeof(nid.szTip));
+	GetWindowText(_hwndItems[i], nid.szTip, sizeof(nid.szTip) / sizeof(nid.szTip[0]));
 	nid.uVersion         = NOTIFYICON_VERSION;
 	Shell_NotifyIcon(NIM_ADD, &nid);
 	Shell_NotifyIcon(NIM_SETVERSION, &nid);
@@ -135,7 +135,7 @@ void RefreshWindowInTray(HWND hwnd) {
 		nid.hWnd   = _hwndHook;
 		nid.uID    = (UINT)i;
 		nid.uFlags = NIF_TIP;
-		GetWindowText(hwnd, nid.szTip, sizeof(nid.szTip));
+		GetWindowText(hwnd, nid.szTip, sizeof(nid.szTip) / sizeof(nid.szTip[0]));
 		Shell_NotifyIcon(NIM_MODIFY, &nid);
 	}
 }
