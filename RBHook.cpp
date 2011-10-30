@@ -26,6 +26,7 @@ static HHOOK _hMouse = NULL;
 static HHOOK _hWndProc = NULL;
 static HWND _hLastHit = NULL;
 
+// Works for 32-bit and 64-bit apps
 LRESULT CALLBACK MouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	if (nCode >= 0) {
 		if (wParam == WM_NCRBUTTONDOWN || wParam == WM_NCRBUTTONUP) {
@@ -53,11 +54,13 @@ LRESULT CALLBACK MouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	return CallNextHookEx(_hMouse, nCode, wParam, lParam);
 }
 
+// Only works for 32-bit apps or 64-bit apps depending on whether this is complied
+// as 32-bit or 64-bit
 LRESULT CALLBACK CallWndRetProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	if (nCode >= 0) {
 		CWPRETSTRUCT *msg = (CWPRETSTRUCT*)lParam;
 		if ((msg->message == WM_WINDOWPOSCHANGED && 
-			(((WINDOWPOS*)msg->lParam)->flags & SWP_SHOWWINDOW) != 0) ||
+			 (((WINDOWPOS*)msg->lParam)->flags & SWP_SHOWWINDOW) != 0) ||
 			(msg->message == WM_NCDESTROY))
 		{
 			PostMessage(FindWindow(NAME, NAME), WM_REFRTRAY, 0, (LPARAM)msg->hwnd);

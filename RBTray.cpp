@@ -81,14 +81,13 @@ static void MinimizeWindowToTray(HWND hwnd) {
 		hwnd = GetAncestor(hwnd, GA_ROOT);
 	}
 
-	if (FindInTray(hwnd) != -1) return;
+	// Add icon to tray if it's not already there
+	if (FindInTray(hwnd) == -1) {
+		AddWindowToTray(hwnd);
+	}
 
-	// Hide before minimizing to disable animation.  Hide again because
-	// minimizing may cause the window to show.
+	// Hide window
 	ShowWindow(hwnd, SW_HIDE);
-	ShowWindow(hwnd, SW_MINIMIZE);
-	ShowWindow(hwnd, SW_HIDE);
-	AddWindowToTray(hwnd);
 }
 
 static void RemoveFromTray(int i) {
@@ -109,15 +108,20 @@ static void RemoveWindowFromTray(HWND hwnd) {
 
 static void RestoreWindowFromTray(HWND hwnd) {
 	ShowWindow(hwnd, SW_SHOW);
-	ShowWindow(hwnd, SW_RESTORE);
 	SetForegroundWindow(hwnd);
 	RemoveWindowFromTray(hwnd);
 }
 
 static void CloseWindowFromTray(HWND hwnd) {
-	SetForegroundWindow(hwnd);
-	SendMessage(hwnd, WM_CLOSE, 0, 0);
+	// Use PostMessage to avoid blocking if the program brings up a dialog on exit.
+	// Also, Explorer windows ignore WM_CLOSE messages from SendMessage.
+	PostMessage(hwnd, WM_CLOSE, 0, 0);
+
+	Sleep(50);
+	if (IsWindow(hwnd)) Sleep(50);
+
 	if (!IsWindow(hwnd)) {
+		// Closed successfully
 		RemoveWindowFromTray(hwnd);
 	}
 }
